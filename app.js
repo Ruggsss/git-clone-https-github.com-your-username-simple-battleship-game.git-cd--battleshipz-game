@@ -1,9 +1,11 @@
 const playerBoard = document.getElementById('player-board');
 const aiBoard = document.getElementById('ai-board');
 const startGameButton = document.getElementById('start-game');
+const gameStatus = document.getElementById('game-status');
 
 let playerShips = [];
 let aiShips = [];
+let gameActive = false;
 
 // Function to create a grid
 function createBoard(board, isPlayer = true) {
@@ -12,7 +14,9 @@ function createBoard(board, isPlayer = true) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     cell.dataset.index = i;
-    cell.addEventListener('click', () => handleCellClick(i, isPlayer));
+    if (!isPlayer) {
+      cell.addEventListener('click', () => handleCellClick(i));
+    }
     board.appendChild(cell);
   }
 }
@@ -23,43 +27,53 @@ createBoard(aiBoard, false);
 
 // Randomly place ships
 function placeShips(board, isPlayer) {
-  let ships = [];
-  while (ships.length < 5) { // For simplicity, we're placing 5 ships
+  let ships = new Set();
+  while (ships.size < 5) { // Placing 5 ships
     const randomPos = Math.floor(Math.random() * 100);
-    if (!ships.includes(randomPos)) {
-      ships.push(randomPos);
-      if (isPlayer) {
-        playerBoard.children[randomPos].classList.add('ship');
-      } else {
-        aiBoard.children[randomPos].classList.add('ship');
-      }
+    ships.add(randomPos);
+    if (isPlayer) {
+      playerBoard.children[randomPos].classList.add('ship');
     }
   }
-  return ships;
+  return Array.from(ships);
 }
 
 // Handle player click
-function handleCellClick(index, isPlayer) {
-  if (isPlayer) return; // Can't click on your own board
+function handleCellClick(index) {
+  if (!gameActive) return;
   if (aiShips.includes(index)) {
     aiBoard.children[index].classList.add('hit');
     aiShips = aiShips.filter(ship => ship !== index);
-    if (aiShips.length === 0) alert('You Win!');
+    gameStatus.textContent = "Hit! Keep going!";
+    if (aiShips.length === 0) {
+      gameStatus.textContent = "You Win!";
+      gameActive = false;
+    }
   } else {
     aiBoard.children[index].classList.add('miss');
+    gameStatus.textContent = "Miss! AI's turn.";
+    setTimeout(aiTurn, 1000);
   }
-  aiTurn();
 }
 
-// AI's turn (just random attack)
+// AI's turn (random attack but avoids duplicates)
 function aiTurn() {
-  const randomIndex = Math.floor(Math.random() * 100);
-  if (playerShips.includes(randomIndex)) {
-    playerBoard.children[randomIndex].classList.add('hit');
-    playerShips = playerShips.filter(ship => ship !== randomIndex);
-    if (playerShips.length === 0) alert('AI Wins!');
+  let attackIndex;
+  do {
+    attackIndex = Math.floor(Math.random() * 100);
+  } while (playerBoard.children[attackIndex].classList.contains('hit') || playerBoard.children[attackIndex].classList.contains('miss'));
+
+  if (playerShips.includes(attackIndex)) {
+    playerBoard.children[attackIndex].classList.add('hit');
+    playerShips = playerShips.filter(ship => ship !== attackIndex);
+    gameStatus.textContent = "AI hit your ship!";
+    if (playerShips.length === 0) {
+      gameStatus.textContent = "AI Wins!";
+      gameActive = false;
+    }
   } else {
-    playerBoard.children[randomIndex].classList.add('miss');
+    playerBoard.children[attackIndex].classList.add('miss');
+    gameStatus.textContent = "AI missed! Your turn.";
   }
 }
 
@@ -67,4 +81,6 @@ function aiTurn() {
 startGameButton.addEventListener('click', () => {
   playerShips = placeShips(playerBoard, true);
   aiShips = placeShips(aiBoard, false);
+  gameActive = true;
+  gameStatus.textContent = "Game started! Your turn.";
 });
