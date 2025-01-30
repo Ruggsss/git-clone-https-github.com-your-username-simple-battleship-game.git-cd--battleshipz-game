@@ -1,35 +1,32 @@
-body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+.grid-cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #000;
+  text-align: center;
+  font-size: 1.2rem;
+  transition: background 0.3s ease;
 }
 
-.board {
-  display: grid;
-  grid-template-columns: repeat(10, 50px);
-  grid-template-rows: repeat(10, 50px);
-  gap: 1px;
-}
-
-.cell {
-  width: 50px;
-  height: 50px;
+.grid-cell:hover {
   background-color: lightblue;
-  border: 1px solid #ddd;
-  cursor: pointer;
 }
-
-.cell.ship {
-  background-color: gray;
+body {
+  background: url('ocean-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Press Start 2P', sans-serif;
 }
-
-.cell.hit {
-  background-color: red;
+@keyframes hit {
+  0% { background-color: red; }
+  100% { background-color: darkred; }
 }
-
-.cell.miss {
-  background-color: lightgray;
+.hit {
+  animation: hit 0.5s ease;
+}
+#turn-indicator {
+  font-size: 1.5rem;
+  padding: 10px;
+  background-color: #222;
+  color: white;
+  display: inline-block;
+  margin-bottom: 10px;
 }
