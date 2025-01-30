@@ -1,0 +1,32 @@
+.grid-cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #000;
+  text-align: center;
+  font-size: 1.2rem;
+  transition: background 0.3s ease;
+}
+
+.grid-cell:hover {
+  background-color: lightblue;
+}
+body {
+  background: url('ocean-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Press Start 2P', sans-serif;
+}
+@keyframes hit {
+  0% { background-color: red; }
+  100% { background-color: darkred; }
+}
+.hit {
+  animation: hit 0.5s ease;
+}
+#turn-indicator {
+  font-size: 1.5rem;
+  padding: 10px;
+  background-color: #222;
+  color: white;
+  display: inline-block;
+  margin-bottom: 10px;
+}
