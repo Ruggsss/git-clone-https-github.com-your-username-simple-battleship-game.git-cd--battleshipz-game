@@ -1,1 +1,1 @@
-# git--https-github.com-ruggsss-battleshipz-game
+git-clone-https-github.com-your-username-simple-battleship-game.git-cd--battleshipz-game
