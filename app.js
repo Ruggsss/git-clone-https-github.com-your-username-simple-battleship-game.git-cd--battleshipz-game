@@ -6,6 +6,7 @@ const gameStatus = document.getElementById('game-status');
 let playerShips = [];
 let aiShips = [];
 let gameActive = false;
+let aiAttackedPositions = new Set();
 
 // Function to create a grid
 function createBoard(board, isPlayer = true) {
@@ -35,14 +36,15 @@ function placeShips(board, isPlayer) {
       playerBoard.children[randomPos].classList.add('ship');
     }
   }
-  return Array.from(ships);
+  return Array.from(ships);  // Ensure ships are stored properly
 }
 
 // Handle player click
 function handleCellClick(index) {
-  if (!gameActive) return;
+  if (!gameActive || aiShips.length === 0) return; // Prevent clicks before game starts
+  
   if (aiShips.includes(index)) {
-    aiBoard.children[index].classList.add('hit');
+    aiBoard.children[index].classList.add('hit'); // Mark hit visually
     aiShips = aiShips.filter(ship => ship !== index);
     gameStatus.textContent = "Hit! Keep going!";
     if (aiShips.length === 0) {
@@ -61,8 +63,10 @@ function aiTurn() {
   let attackIndex;
   do {
     attackIndex = Math.floor(Math.random() * 100);
-  } while (playerBoard.children[attackIndex].classList.contains('hit') || playerBoard.children[attackIndex].classList.contains('miss'));
-
+  } while (aiAttackedPositions.has(attackIndex));
+  
+  aiAttackedPositions.add(attackIndex); // Track AI attacks
+  
   if (playerShips.includes(attackIndex)) {
     playerBoard.children[attackIndex].classList.add('hit');
     playerShips = playerShips.filter(ship => ship !== attackIndex);
@@ -81,6 +85,8 @@ function aiTurn() {
 startGameButton.addEventListener('click', () => {
   playerShips = placeShips(playerBoard, true);
   aiShips = placeShips(aiBoard, false);
+  aiAttackedPositions.clear(); // Reset AI attack memory
+  console.log("AI Ships at:", aiShips); // Debugging
   gameActive = true;
   gameStatus.textContent = "Game started! Your turn.";
 });
